@@ -29,8 +29,11 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 <div className="row meme-heading">
                     <b>{currentMeme.title}</b>&nbsp; ({currentMeme.tags})
                 </div>
+                <div className="row meme-heading">
+                    <b>{currentMeme.uploaded}</b>
+                </div>
                 <div className="row meme-date">
-                    {currentMeme.uploaded}
+                    <b>{currentMeme.uploaded}</b>&nbsp; ({currentMeme.tags})
                 </div>
                 <div className="row meme-img">
                     <img src={currentMeme.url}/>
@@ -40,6 +43,9 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                     <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div>
                     <div className="btn btn-primary btn-action" onClick={this.onOpenModal}>Edit </div>
                     <div className="btn btn-primary btn-action" onClick={this.deleteMeme.bind(this, currentMeme.id)}>Delete </div>
+                </div>
+                <div className = "footer">
+                    <p> Add some proffesional looking shit here</p>
                 </div>
                 <Modal open={open} onClose={this.onCloseModal}>
                     <form>

@@ -36,19 +36,17 @@ class App extends React.Component<{}, IState> {
 		return (
 		<div>
 			<div className="header-wrapper">
-				<div className="container header">
-					<img src={PatrickLogo} height='40'/>&nbsp; My Meme Bank - MSA 2018 &nbsp;
-					<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>Add Meme</div>
+				<div className="container-header">
+					<img src={PatrickLogo} height='40'/>&nbsp; Stock Image Bank &nbsp;
+					<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>Add Image "+"</div>
 				</div>
 			</div>
 			<div className="container">
-				<div className="row">
-					<div className="col-7">
+				<div className="row-1">
+					<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes}/>
+				</div>
+				<div className="row-2">
 						<MemeDetail currentMeme={this.state.currentMeme} />
-					</div>
-					<div className="col-5">
-						<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes}/>
-					</div>
 				</div>
 			</div>
 			<Modal open={open} onClose={this.onCloseModal}>
