@@ -1,6 +1,7 @@
 import * as React from 'react';
+import * as Webcam from "react-webcam";
+// tslint:disable-next-line:ordered-imports
 import Modal from 'react-responsive-modal';
-// import * as Webcam from "react-webcam";
 import './App.css';
 import MemeDetail from './components/MemeDetail';
 import MemeList from './components/MemeList';
@@ -11,9 +12,12 @@ interface IState {
 	memes: any[],
 	open: boolean,
 	uploadFileList: any,
-	// authenticated: boolean,
-	// refCamera: any
-	imageFound: boolean
+	authenticated: boolean,
+	refCamera: any,
+	imageFound: boolean,
+	predictionResult: any,
+	stylePath: any
+
 }
 
 class App extends React.Component<{}, IState> {
@@ -24,10 +28,12 @@ class App extends React.Component<{}, IState> {
 			memes: [],
 			open: false,
 			uploadFileList: null,
-			// authenticated: false,
-			// refCamera: React.createRef(),
 			// tslint:disable-next-line:object-literal-sort-keys
-			imageFound: true
+			authenticated: false,
+			refCamera: React.createRef(),
+			imageFound: true,
+			predictionResult: 0.0,
+			stylePath: 'index.css'
 		}
 
 		this.selectNewMeme = this.selectNewMeme.bind(this)
@@ -36,16 +42,83 @@ class App extends React.Component<{}, IState> {
 		this.handleFileUpload = this.handleFileUpload.bind(this)
 		this.uploadMeme = this.uploadMeme.bind(this)
 		this.authenticate = this.authenticate.bind(this)
+		this.getFaceRecognitionResult = this.getFaceRecognitionResult.bind(this)
+		this.changeTheme = this.changeTheme.bind(this)
 	}
 
 	public render() {
-		// const {  } = this.state;
 
 		const { open } = this.state;
+		const { authenticated } = this.state;
 
-		// const { authenticated } = this.state;
+		// maybe add FAQ page aswell---------------------------------------------------------------------------------------------------
+
 
 		if (this.state.imageFound) {
+			return (
+				<div>
+					{(!authenticated) ?
+						<Modal open={!authenticated} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
+							<Webcam
+								audio={false}
+								screenshotFormat="image/jpeg"
+								ref={this.state.refCamera}
+							/>
+							<div className="row nav-row">
+								<div className="btn btn-primary bottom-button" onClick={this.authenticate}>Login</div>
+							</div>
+						</Modal> : ""}
+
+					{(authenticated) ?
+						<div>
+							<div className="header-wrapper">
+								<div className="container-header">
+									<img src={PatrickLogo} height='40' />&nbsp; Stock Image Bank &nbsp;
+						<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>+ New</div>
+								</div>
+							</div>
+							<div>
+								{/* <link rel="stylesheet" type="text/css" href={this.state.stylePath}                       CSS BUTTON />
+								<button type="btn btn-primary btn-action btn-add" onClick={this.changeTheme}>Click to update stylesheet</button> */}
+							</div>
+							<div className="container">
+								<div className="row-1">
+									<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								</div>
+								<div className="row-2">
+									<MemeDetail currentMeme={this.state.currentMeme} />
+								</div>
+							</div>
+							<Modal open={open} onClose={this.onCloseModal}>
+								<form>
+									<div className="form-group">
+										<label>Meme Title</label>
+										<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
+										<small className="form-text text-muted">You can edit any meme later</small>
+									</div>
+									<div className="form-group">
+										<label>Tag</label>
+										<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
+										<small className="form-text text-muted">Tag is used for search</small>
+									</div>
+									<div className="form-group">
+										<label>Image</label>
+										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
+									</div>
+									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+								</form>
+							</Modal>
+							<div className="footer-group">
+								<img src={PatrickLogo} height='40' />&nbsp; This free collection of stock images can be used in any personal project. &nbsp;
+				<div className="footer-txt">
+									<p>Feel free to share your images: <br />  via circle buttons</p>
+								</div>
+							</div>
+						</div>
+						: ""}
+				</div>
+			);
+		} else {
 			return (
 				<div>
 					<div className="header-wrapper">
@@ -54,15 +127,22 @@ class App extends React.Component<{}, IState> {
 					<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>+ New</div>
 						</div>
 					</div>
-
 					<div className="container">
 						<div className="row-1">
 							<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
 						</div>
-						<div className="row-2">
-							<MemeDetail currentMeme={this.state.currentMeme} />
+						<div className="error-heading">
+							<p>Looks like we have no stock images for that tag</p>
+						</div>
+						<div className="error-subheading">
+							<p>Try entering something else in the search bar </p>
+						</div>
+						<div className="error-subheading">
+							<p> or add an image of what you searched for via the add button</p>
 						</div>
 					</div>
+					{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
+
 					<Modal open={open} onClose={this.onCloseModal}>
 						<form>
 							<div className="form-group">
@@ -82,40 +162,6 @@ class App extends React.Component<{}, IState> {
 							<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
 						</form>
 					</Modal>
-					<div className="footer-group">
-						<img src={PatrickLogo} height='40' />&nbsp; This free collection of stock images can be used in any personal project. &nbsp;
-				<div className="footer-txt">
-							<p>Feel free to share your images: <br />  via circle buttons</p>
-						</div>
-					</div>
-				</div>
-			);
-		} else {
-			return (
-				<div>
-					<div className="header-wrapper">
-						<div className="container-header">
-							<img src={PatrickLogo} height='40' />&nbsp; Stock Image Bank &nbsp;
-					<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>+ New</div>
-						</div>
-					</div>
-					<div className="container">
-						<div className="row-1">
-							<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
-						</div>
-
-
-						<div className="error-heading">
-							<p>Looks like we have no stock images for that tag</p>
-						</div>
-						<div className="error-subheading">
-							<p>Try entering something else in the search bar </p>
-						</div>
-						<div className="error-subheading">
-							<p> or add an image of what you searched for via the add button</p>
-						</div>
-					</div>
-					{/* add a image hear pointing to the add option if need be with the logo --------------------- */}
 
 					<div className="large-spacing">
 						<p> large spacing </p>
@@ -133,7 +179,44 @@ class App extends React.Component<{}, IState> {
 
 	// Authenticate
 	private authenticate() {
-		// const screenshot = this.state.refCamera.current.getScreenshot();
+		const screenshot = this.state.refCamera.current.getScreenshot();
+		this.getFaceRecognitionResult(screenshot);
+	}
+
+	// Call custom vision model
+	private getFaceRecognitionResult(image: string) {
+		const url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/3273e23a-35da-4653-a948-1e6ccc2a5a33/image?iterationId=f03d6dfe-a9bb-430e-8124-e0582f630acc"
+		if (image === null) {
+			return;
+		}
+		const base64 = require('base64-js');
+		const base64content = image.split(";")[1].split(",")[1]
+		const byteArray = base64.toByteArray(base64content);
+		fetch(url, {
+			body: byteArray,
+			headers: {
+				// tslint:disable-next-line:object-literal-sort-keys
+				'cache-control': 'no-cache', 'Prediction-Key': 'e512b8c6f3634c2fb62c65fcec36950e', 'Content-Type': 'application/octet-stream'
+			},
+			method: 'POST'
+		})
+			.then((response: any) => {
+				if (!response.ok) {
+					// Error State
+					alert(response.statusText)
+				} else {
+					response.json().then((json: any) => {
+						console.log(json.predictions[0])
+						this.setState({ predictionResult: json.predictions[0] })
+						if (this.state.predictionResult.probability > 0.7) {
+							this.setState({ authenticated: true })
+						} else {
+							this.setState({ authenticated: false })
+
+						}
+					})
+				}
+			})
 	}
 
 	// Modal open
@@ -193,6 +276,7 @@ class App extends React.Component<{}, IState> {
 
 	// Added via MSA repo
 	private uploadMeme() {
+		console.log("it ran")
 		const titleInput = document.getElementById("meme-title-input") as HTMLInputElement
 		const tagInput = document.getElementById("meme-tag-input") as HTMLInputElement
 		const imageFile = this.state.uploadFileList[0]
@@ -223,6 +307,11 @@ class App extends React.Component<{}, IState> {
 					location.reload()
 				}
 			})
+	}
+
+	private changeTheme() {
+		console.log("it ran")
+		this.setState({ stylePath: 'darktheme.css' });
 	}
 }
 

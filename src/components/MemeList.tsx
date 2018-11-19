@@ -1,5 +1,21 @@
 import MediaStreamRecorder from 'msr';
 import * as React from "react";
+// tslint:disable-next-line:ordered-imports
+import TextField from '@material-ui/core/TextField';
+// tslint:disable-next-line:ordered-imports
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+// theme used to set items to cyan
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+          main: '#512da8',
+        },
+        secondary: {
+          main: '#512da8',
+        },
+      },
+});
 
 interface IProps {
     memes: any[],
@@ -13,6 +29,8 @@ export default class MemeList extends React.Component<IProps, {}> {
         this.searchByTag = this.searchByTag.bind(this),
         this.searchTagByVoice = this.searchTagByVoice.bind(this),
         this.postAudio = this.postAudio.bind(this);
+
+        // value={this.state.inputString}
     }
 
     public render() {
@@ -20,7 +38,11 @@ export default class MemeList extends React.Component<IProps, {}> {
             <div className="container meme-list-wrapper">
                 <div className="row meme-list-heading">
                     <div className="input-group">
-                        <input type="text" id="search-tag-textbox" className="form-control" placeholder="Search for photos"/>
+                    <MuiThemeProvider theme={theme}> 
+                    <TextField id="search-tag-textbox" type="text" placeholder="Search for photos"/>
+
+                        {/* <input type="text" id="search-tag-textbox" className="form-control" placeholder="Search for photos"/> */}
+                    </MuiThemeProvider> 
                         <div className="input-group-append">
                             <div className="btn btn-outline-secondary search-button" onClick={this.searchByTag}>Search</div>
                         </div>
