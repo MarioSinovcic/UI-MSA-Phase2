@@ -5,7 +5,7 @@ import Modal from 'react-responsive-modal';
 import './App.css';
 import MemeDetail from './components/MemeDetail';
 import MemeList from './components/MemeList';
-import PatrickLogo from './patrick-logo.png';
+import PatrickLogo from './stock-sloth-logo-white.png';
 
 interface IState {
 	currentMeme: any,
@@ -310,7 +310,7 @@ class App extends React.Component<{}, IState> {
 	}
 
 	private changeTheme() {
-		console.log("it ran")
+
 		this.setState({ stylePath: 'darktheme.css' });
 	}
 }
