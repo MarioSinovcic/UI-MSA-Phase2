@@ -106,7 +106,6 @@ export default class MemeList extends React.Component<IProps, {}> {
             },
             method: 'POST'
         }).then((response) => {
-            // console.log(response.text())
             return response.text()
         }).then((response) => {
             console.log(response)
@@ -128,8 +127,8 @@ export default class MemeList extends React.Component<IProps, {}> {
         return res.json()
     }).then((res: any) => {
         console.log(res)
-        // const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
-        // textBox.value = (res.DisplayText as string).slice(0, -1)
+        const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
+        textBox.value = (res.DisplayText as string).slice(0, -1)
     }).catch((error) => {
         console.log("Error", error)
     });

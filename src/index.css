@@ -29,7 +29,27 @@ body{
   font-size: 25px;
   position: relative;
   padding-top: 10px;
-  padding-left: 0px;
+}
+
+.error-heading{
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  font-size: 30px;
+}
+
+.error-subheading{
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  font-size: 18px;
+  opacity: 0.6;
 }
 
 .container{
@@ -92,7 +112,12 @@ body{
 
 .spacing{
   opacity: 0;
-  height:25px;
+  height:50px;
+}
+
+.large-spacing{
+  opacity: 0;
+  height: 330px;
 }
 
 .meme-date {
@@ -141,7 +166,8 @@ body{
 
 /* Meme List */
 .meme-list-wrapper {
-  padding-top:20px;
+  padding-top:50px;
+  padding-bottom: 35px;
 }
 
 .meme-list-table {
@@ -167,8 +193,8 @@ body{
 .footer-group{
   width:100%;
   background-color: #73b4ce;
-  padding-top: 20px;
-  padding-bottom: 50px;
+  padding-top: 40px;
+  padding-bottom: 60px;
   border-top: 5px solid #eeeeee;
   text-align: left;
 }
