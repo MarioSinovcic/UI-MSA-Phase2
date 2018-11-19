@@ -34,14 +34,20 @@ body{
 
 .container{
   width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Selected Meme */
+.row-2{
+  align-items: center;
+  justify-content: center;
+}
+
+
 .meme-wrapper {
   width:100%;
-  padding-top:20px;
-  padding-left: 30px;
-  padding-right: 30px;
+  align-items: center;
+  justify-content: center;
 }
 
 .meme-heading {
@@ -51,6 +57,10 @@ body{
   justify-content: center;
   font-weight: normal;
   font-size: 18px;
+}
+
+.date-header{
+  margin: auto;
 }
 
 .meme-date {
@@ -69,15 +79,24 @@ body{
   justify-content: center;
   background-color: #eeeeee;
   overflow: hidden;
-  width: 100%;
+  width: 80%;
 }
 
 .meme-img img {
+  align-items: center;
+  justify-content: center;
+
   /* height: calc(100vh);
   width: calc(100vw); */
 }
 
+.spacing{
+  opacity: 0;
+  height:25px;
+}
+
 .meme-date {
+  width:100%;
   display: flex;
   align-items: left;
   justify-content: left;
@@ -92,7 +111,8 @@ body{
   justify-content: left;
   font-weight: normal;
   font-size: 20px;
-  margin-top: 20px;
+  margin-top: 30px;
+  padding-bottom: 50px;
 }
 
 .btn-action{
@@ -141,14 +161,19 @@ body{
   align-items: center;
   justify-content: center;
   padding-top: 25 px;
+  padding-bottom: 500 px;
 }
 
-.footer{
-  padding-top: 30px;
-  color: #d18c1b;
+.footer-group{
+  width:100%;
+  background-color: #73b4ce;
+  padding-top: 20px;
   padding-bottom: 50px;
-  margin: auto 0;
-  text-align: center;
+  border-top: 5px solid #eeeeee;
+  text-align: left;
+}
+
+.footer-txt{
   opacity: 0.5;
 }
 

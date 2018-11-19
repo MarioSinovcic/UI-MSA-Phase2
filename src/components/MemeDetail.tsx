@@ -1,5 +1,11 @@
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import * as React from "react";
 import Modal from 'react-responsive-modal';
+
 
 interface IProps {
     currentMeme: any
@@ -21,31 +27,37 @@ export default class MemeDetail extends React.Component<IProps, IState> {
         this.deleteMeme = this.deleteMeme.bind(this)
     }
 
+
+
 	public render() {
         const currentMeme = this.props.currentMeme
         const { open } = this.state;
 		return (
-			<div className="container meme-wrapper">
-                <div className="row meme-heading">
-                    <b>{currentMeme.title}</b>&nbsp; ({currentMeme.tags})
+			<div className="meme-wrapper">
+
+                {/* all of this should go into sets expansion panels below the image */}
+                {/* <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button> */}
+                <div className= "image-display">
+                {/* <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div>
+                <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div> */}
+                    <div className="row meme-img">
+                        <img src={currentMeme.url}/>
+                    </div>
                 </div>
-                <div className="row meme-heading">
-                    <b>{currentMeme.uploaded}</b>
-                </div>
-                <div className="row meme-date">
-                    <b>{currentMeme.uploaded}</b>&nbsp; ({currentMeme.tags})
-                </div>
-                <div className="row meme-img">
-                    <img src={currentMeme.url}/>
-                </div>
+                <div className="spacing"><p> spacing </p></div>
+                <ExpansionPanel>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography className="meme-heading">{currentMeme.title}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                <Typography> Discription: <br/> Uploaded:  {currentMeme.uploaded} <br/> Tags:  {currentMeme.tags} </Typography>
+                </ExpansionPanelDetails>
+                </ExpansionPanel>
                 
                 <div className="row meme-done-button">
                     <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div>
                     <div className="btn btn-primary btn-action" onClick={this.onOpenModal}>Edit </div>
                     <div className="btn btn-primary btn-action" onClick={this.deleteMeme.bind(this, currentMeme.id)}>Delete </div>
-                </div>
-                <div className = "footer">
-                    <p> Add some proffesional looking shit here</p>
                 </div>
                 <Modal open={open} onClose={this.onCloseModal}>
                     <form>

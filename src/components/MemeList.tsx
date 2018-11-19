@@ -5,7 +5,6 @@ interface IProps {
     memes: any[],
     selectNewMeme: any,
     searchByTag: any,
-    // searchFieldText: any
 }
 
 export default class MemeList extends React.Component<IProps, {}> {
@@ -14,7 +13,6 @@ export default class MemeList extends React.Component<IProps, {}> {
         this.searchByTag = this.searchByTag.bind(this),
         this.searchTagByVoice = this.searchTagByVoice.bind(this),
         this.postAudio = this.postAudio.bind(this);
-        // this.se
     }
 
     public render() {
