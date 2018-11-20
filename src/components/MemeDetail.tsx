@@ -6,8 +6,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import * as React from "react";
 import Modal from 'react-responsive-modal';
 
-
-
 interface IProps {
     currentMeme: any
 }
@@ -35,11 +33,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
         const { open } = this.state;
 		return (
 			<div className="meme-wrapper">
-
-                {/* all of this should go into sets expansion panels below the image */}
-                {/* <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button> */}
                 <div className= "image-display">
-                {/* insert left and righst if needed */}
                     <div className="row meme-img">
                         <img src={currentMeme.url}/>
                     </div>

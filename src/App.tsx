@@ -27,7 +27,6 @@ interface IState {
 	redirect: any,
 
 	darktheme: boolean
-
 }
 
 class App extends React.Component<{}, IState> {
