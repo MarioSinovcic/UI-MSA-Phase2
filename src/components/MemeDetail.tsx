@@ -7,6 +7,7 @@ import * as React from "react";
 import Modal from 'react-responsive-modal';
 
 
+
 interface IProps {
     currentMeme: any
 }
@@ -38,8 +39,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 {/* all of this should go into sets expansion panels below the image */}
                 {/* <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button> */}
                 <div className= "image-display">
-                {/* <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div>
-                <div className="btn btn-primary btn-action" onClick={this.downloadMeme.bind(this, currentMeme.url)}>Download </div> */}
+                {/* insert left and righst if needed */}
                     <div className="row meme-img">
                         <img src={currentMeme.url}/>
                     </div>
@@ -47,10 +47,10 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 <div className="spacing"><p> spacing </p></div>
                 <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography className="meme-heading">{currentMeme.title}</Typography>
+                    <Typography className="meme-heading">{currentMeme.title}</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
-                <Typography> Discription: <br/> Uploaded:  {currentMeme.uploaded} <br/> Tags:  {currentMeme.tags} </Typography>
+                    <Typography> Discription: <br/> Uploaded:  {currentMeme.uploaded} <br/> Tags:  {currentMeme.tags} </Typography>
                 </ExpansionPanelDetails>
                 </ExpansionPanel>
                 

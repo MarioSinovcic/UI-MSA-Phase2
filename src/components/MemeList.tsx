@@ -1,11 +1,10 @@
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import MediaStreamRecorder from 'msr';
 import * as React from "react";
-// tslint:disable-next-line:ordered-imports
-import TextField from '@material-ui/core/TextField';
-// tslint:disable-next-line:ordered-imports
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-// theme used to set items to cyan
+
+// theme used to set colours of UI components
 const theme = createMuiTheme({
     palette: {
         primary: {
@@ -29,8 +28,6 @@ export default class MemeList extends React.Component<IProps, {}> {
         this.searchByTag = this.searchByTag.bind(this),
         this.searchTagByVoice = this.searchTagByVoice.bind(this),
         this.postAudio = this.postAudio.bind(this);
-
-        // value={this.state.inputString}
     }
 
     public render() {
@@ -39,13 +36,8 @@ export default class MemeList extends React.Component<IProps, {}> {
                 <div className="row meme-list-heading">
                     <div className="input-group">
                     <MuiThemeProvider theme={theme}> 
-                    <TextField id="search-tag-textbox" type="text" placeholder="Search for photos"/>
-
-                        {/* <input type="text" id="search-tag-textbox" className="form-control" placeholder="Search for photos"/> */}
+                        <TextField id="search-tag-textbox" type="text"  placeholder="Search for photos"/>
                     </MuiThemeProvider> 
-                        <div className="input-group-append">
-                            <div className="btn btn-outline-secondary search-button" onClick={this.searchByTag}>Search</div>
-                        </div>
                         <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
                     </div>
                 </div>                
@@ -56,11 +48,16 @@ export default class MemeList extends React.Component<IProps, {}> {
                         </tbody>
                     </table>
                 </div> */}
+                <div className="searchButton">
+                <MuiThemeProvider theme={theme}> 
+                        <div className="btn btn-primary btn-action" onClick={this.searchByTag} > Search </div>
+                </MuiThemeProvider> 
+                </div>
             </div>
         );
     }
 
-    // Construct table using meme list
+    // // Construct table using meme list
     // private createTable() {
     //     const table: any[] = []
     //     const memeList = this.props.memes
@@ -79,7 +76,7 @@ export default class MemeList extends React.Component<IProps, {}> {
     //     return table
     // }
 
-    // Meme selection handler to display selected meme in details component
+    // // Meme selection handler to display selected meme in details component
     // private selectRow(index: any) {
     //     const selectedMeme = this.props.memes[index]
     //     if (selectedMeme != null) {
