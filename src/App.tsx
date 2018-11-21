@@ -1,16 +1,31 @@
 import Switch from '@material-ui/core/Switch';
 import * as React from 'react';
 // import FacebookShareButton from 'react-share';
-// import FacebookLogin from 'react-facebook-login';
 // tslint:disable-next-line:ordered-imports
 import Modal from 'react-responsive-modal';
+import ChatBot from 'react-simple-chatbot';
 import * as Webcam from "react-webcam";
+import { ThemeProvider } from 'styled-components';
 import './App.css';
 // tslint:disable-next-line:ordered-imports
-import MemeDetail from './components/MemeDetail';
-import MemeList from './components/MemeList';
+import EditButtons from './components/EditButtons';
+import Searching from './components/Searching';
 import BlackLogo from './stock-sloth-logo-black.png';
 import WhiteLogo from './stock-sloth-logo-white.png';
+
+// theme settings for chatbox
+const chatBotTheme = {
+	background: '#f5f8fb',
+	fontFamily: 'Helvetica Neue',
+	headerBgColor: '#cd853f',
+	headerFontColor: '#fff',
+	headerFontSize: '15px',
+	// tslint:disable-next-line:object-literal-sort-keys
+	botBubbleColor: '#cd853f',
+	botFontColor: '#eeeeee',
+	userBubbleColor: '#fff',
+	userFontColor: 'black',
+  };
 
 interface IState {
 	currentMeme: any,
@@ -26,13 +41,16 @@ interface IState {
 	responce: any,
 	redirect: any,
 
-	darktheme: boolean
+	darktheme: boolean,
+
+	loading: boolean,
+	result: any,
+	trigger: boolean,
+
+	chatActive: boolean
 }
 
 class App extends React.Component<{}, IState> {
-	// tslint:disable-next-line:member-access
-	darktheme = false;
-
 	constructor(props: any) {
 		super(props)
 		this.state = {
@@ -50,7 +68,13 @@ class App extends React.Component<{}, IState> {
 			responce: null,
 			redirect: null,
 
-			darktheme: false
+			darktheme: false,
+
+			loading: true,
+			result: '',
+			trigger: false,
+
+			chatActive: false
 		}
 
 		this.selectNewMeme = this.selectNewMeme.bind(this)
@@ -62,21 +86,69 @@ class App extends React.Component<{}, IState> {
 		this.guestUser = this.guestUser.bind(this)
 		this.getFaceRecognitionResult = this.getFaceRecognitionResult.bind(this)
 		this.changeTheme = this.changeTheme.bind(this)
+		this.openChat = this.openChat.bind(this)
 	}
 
 	public render() {
 		const { open } = this.state;
+		// this is used to ditermine the chatbox logic
+		const steps=[
+			{
+				id: '1',
+				message: 'Hello there, welcome to stock sloth. What are you having trouble with?',
+				trigger: '2',
+			  },
+			  {
+				id: '2',
+				options: [
+				  { value: 1, label: 'Uploading', trigger: '3' },
+				  { value: 2, label: 'Editing', trigger: '4' },
+				  { value: 3, label: 'Searching', trigger: '5' },
+				],
+			  },
+			  {
+				id: '3',
+				message: 'First check your internet connection is reliable. To upload new images use the Upload button in the top right corner. This should open up a pop-up screen displaying all the information need for you to will need to enter about your new photo. Then simply select your file and upload it, via the choose file and upload buttons.',	trigger: '6',
+			  },
+			  {
+				id: '4',
+				message: 'Editing is done via the Edit button on the main screen. This should open up a pop-up screen displaying the current photos tag and title, which can then be changed. Insure your internet connection is reliable when editing photos.',			trigger: '6',
+			  },
+			  {
+				id: '5',
+				message: 'Searching is done via the search bar at the top of the screen. Enter a type of animal (making sure to exclude any spaces or invalid characters) and the system should show you the first image associated with that animal.',			trigger: '6',
+			  },
+			  {
+				id: '6',
+				message: 'Is there anything else you are having trouble with?',
+				trigger: '7',
+			  },
+			  {
+				id: '7',
+				options: [
+				  { value: 1, label: 'No', trigger: '9' },
+				  { value: 2, label: 'Yes', trigger: '8' },
+				],
+			  },
+			  {
+				id: '8',
+				message: 'What else do you need help with?',
+				trigger: '2'
+			  },
+			  {
+				id: '9',
+				message: 'Hope this was helpful.',
+			  },
+		]
 
-		// maybe add FAQ page aswell---------------------------------------------------------------------------------------------------
-
-		if(!(this.state.authenticated)){
-			return(
-				 // move this to be above the if statement, so it is run once 
-					<div>
-						<div className="login-background">
-							<p>Background</p>
-						</div>
-						<Modal open={true} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
+		if (!(this.state.authenticated)) {
+			return (
+				// move this to be above the if statement, so it is run once 
+				<div>
+					<div className="login-background">
+						<p>Background</p>
+					</div>
+					<Modal open={true} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
 						<div className='containter-login'>
 							<div className="login-image">
 								<img src={BlackLogo} height='60' />
@@ -85,238 +157,266 @@ class App extends React.Component<{}, IState> {
 								<p>Stock Sloth</p>
 							</div>
 							<div >
-							<Webcam className="camera"
-								heigth= "300"
-								width= "400"
-								audio={false}
-								screenshotFormat="image/jpeg"
-								ref={this.state.refCamera}
-							/>
+								<Webcam className="camera"
+									heigth="300"
+									width="400"
+									audio={false}
+									screenshotFormat="image/jpeg"
+									ref={this.state.refCamera} />
 							</div>
 							<div className="row-nav-row">
-								<div className="btn btn-primary bottom-button" onClick={this.authenticate}>Facial Authentication </div>
-								<div className="btn btn-primary" onClick={this.guestUser}>Guest User Login</div>
+								<div className="btn btn-primary btn-action-login" onClick={this.authenticate}>Developer Login</div>
+								<div className="spacing-button"><p>Space</p></div>
+								<div className="btn btn-primary btn-action-login" onClick={this.guestUser}>User Login</div>
 							</div>
 						</div>
-						</Modal>
-					</div>
+					</Modal>
+				</div>
 			)
-		} else{
-		if(this.state.darktheme){
-			if (this.state.imageFound) {
-				return (
-					<div className="background-dark">
-						<div className="header-wrapper-dark">
-							<div className="container-header">
-								<img src={BlackLogo} height='40' />&nbsp; Stock Sloth &nbsp;
+		} else {
+			if (this.state.darktheme) {
+				if (this.state.imageFound) {
+					return (
+						<div className="background-dark">
+							<div className="header-wrapper-dark">
+								<div className="container-header">
+									<img src={BlackLogo} height='40' />&nbsp; Stock Sloth &nbsp;
 								<Switch
-          						onChange={this.changeTheme}
-		  						value="checkedA"
-		  						color="default"
-        						/>
-								<div className="btn btn-primary btn-action-dark btn-add" onClick={this.onOpenModal}>+ New</div>
-							</div>
-
-						</div>
-						<div className="container">
-							<div className="row-1">
-								<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
-							</div>
-							<div className="row-2">
-								<MemeDetail currentMeme={this.state.currentMeme} />
-							</div>
-						</div>
-						<Modal open={open} onClose={this.onCloseModal}>
-							<form>
-								<div className="form-group">
-									<label>Photo Title</label>
-									<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
-									<small className="form-text text-muted">You can edit your photo later</small>
+										onChange={this.changeTheme}
+										value="checkedA"
+										color="default"
+									/>
+									<div className="btn btn-primary btn-action-dark btn-add" onClick={this.onOpenModal}>Upload</div>
 								</div>
-								<div className="form-group">
+
+							</div>
+							<div className="container">
+								<div className="row-1">
+									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								</div>
+								<div className="row-2">
+									<EditButtons currentMeme={this.state.currentMeme} />
+								</div>
+							</div>
+							<Modal open={open} onClose={this.onCloseModal}>
+								<form>
+									<div className="form-group">
+										<label> Photo Title</label>
+										<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
+										<small className="form-text text-muted">You can edit this information later</small>
+									</div>
+									<div className="form-group">
 										<label>Tag</label>
 										<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
-										<small className="form-text text-muted">Tags are used for search</small>
-								</div>
-								<div className="form-group">
-									<label>Image</label>
-									<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
-								</div>
+										<small className="form-text text-muted">Tag is used when searching for images</small>
+									</div>
+									<div className="form-group">
+										<label>Image</label>
+										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
+									</div>
 									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
-							</form>
-						</Modal>
-						<div className="footer-group-dark">
-						<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" >Help</div>&nbsp; Stock Sloth - a stock photo bank for animals &nbsp; 
+								</form>
+							</Modal>
+							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
+							<ThemeProvider theme={chatBotTheme}>
+								<ChatBot openChat={this.state.chatActive} steps={steps}/>
+							</ThemeProvider>
+							</Modal>
+							<div className="footer-group-dark">
+								<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 							<div className="footer-txt">
+									<p>Feel free to share your images: <br />  via circle buttons</p>
+								</div>
+							</div>
+						</div>
+					);
+				} else {
+					return (
+						<div className="background-dark">
+							<div className="header-wrapper-dark">
+								<div className="container-header">
+									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
+								<Switch
+										onChange={this.changeTheme}
+										value="checkedA"
+										color="default"
+									/>
+									<div className="btn btn-primary btn-action-dark btn-add" onClick={this.onOpenModal}>Upload</div>
+								</div>
+							</div>
+							<div className="container">
+								<div className="row-1">
+									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								</div>
+								<div className="error-heading-dark">
+									<p>Looks like we have no stock images for that tag</p>
+								</div>
+								<div className="error-subheading-dark">
+									<p>Try entering something else in the search bar </p>
+								</div>
+								<div className="error-subheading-dark">
+									<p> or add an image of what you searched for via the add button</p>
+								</div>
+							</div>
+							{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
+
+							<Modal open={open} onClose={this.onCloseModal}>
+								<form>
+									<div className="form-group">
+										<label> Photo Title</label>
+										<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
+										<small className="form-text text-muted">You can edit this information later</small>
+									</div>
+									<div className="form-group">
+										<label>Tag</label>
+										<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
+										<small className="form-text text-muted">Tag is used when searching for images</small>
+									</div>
+									<div className="form-group">
+										<label>Image</label>
+										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
+									</div>
+									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+								</form>
+							</Modal>
+
+							<div className="large-spacing">
+								<p> large spacing </p>
+							</div>
+							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
+							<ThemeProvider theme={chatBotTheme}>
+								<ChatBot openChat={this.state.chatActive} steps={steps}/>
+							</ThemeProvider>
+							</Modal>
+							<div className="footer-group-dark">
+								<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 								<p>Feel free to share your images: <br />  via circle buttons</p>
 							</div>
 						</div>
-					</div>
-				);
+					)
+				}
 			} else {
-				return (
-					<div className="background-dark">
-						<div className="header-wrapper-dark">
-							<div className="container-header">
-								<img src={WhiteLogo} height='40' />&nbsp; Stock Image Bank &nbsp;
-						<div className="btn btn-primary btn-action-dark btn-add" onClick={this.onOpenModal}>+ New</div>
-							</div>
-						</div>
-						<div className="container">
-							<div className="row-1">
-								<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
-							</div>
-							<div className="error-heading">
-								<p>Looks like we have no stock images for that tag</p>
-							</div>
-							<div className="error-subheading">
-								<p>Try entering something else in the search bar </p>
-							</div>
-							<div className="error-subheading">
-								<p> or add an image of what you searched for via the add button</p>
-							</div>
-						</div>
-						{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
-	
-						<Modal open={open} onClose={this.onCloseModal}>
-							<form>
-								<div className="form-group">
-									<label>Meme Title</label>
-									<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
-									<small className="form-text text-muted">You can edit any meme later</small>
-								</div>
-								<div className="form-group">
-									<label>Tag</label>
-									<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
-									<small className="form-text text-muted">Tag is used for search</small>
-								</div>
-								<div className="form-group">
-									<label>Image</label>
-									<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
-								</div>
-								<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
-							</form>
-						</Modal>
-	
-						<div className="large-spacing">
-							<p> large spacing </p>
-						</div>
-	
-						<div className="footer-group-dark">
-						<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" >Help</div>&nbsp; Stock Sloth - a stock photo bank for animals &nbsp; 
-								<p>Feel free to share your images: <br />  via circle buttons</p>
-						</div>
-					</div>
-				)
-			}
-		}else{		
-		if (this.state.imageFound) {
-			return (
-				<div>
-					<div className="header-wrapper">
-						<div className="container-header">
-							<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
+				if (this.state.imageFound) {
+					return (
+						<div className="background-light">
+							<div className="header-wrapper">
+								<div className="container-header">
+									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
 							<Switch
-          						onChange={this.changeTheme}
-		  						value="checkedA"
-		  						color="default"
-        						/>		
-							<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>+ New</div>
-						</div>
-					</div>
-					<div className="container">
-						<div className="row-1">
-							<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
-						</div>
-						<div className="row-2">
-							<MemeDetail currentMeme={this.state.currentMeme} />
-						</div>
-					</div>
-					<Modal open={open} onClose={this.onCloseModal}>
-						<form>
-							<div className="form-group">
-								<label>Photo Title</label>
-								<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
-								<small className="form-text text-muted">You can edit your photo later</small>
+										onChange={this.changeTheme}
+										value="checkedA"
+										color="default"
+									/>
+									<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>Upload</div>
+								</div>
 							</div>
-							<div className="form-group">
-									<label>Tag</label>
-									<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
-									<small className="form-text text-muted">Tags are used for search</small>
+							<div className="container">
+								<div className="row-1">
+									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								</div>
+								<div className="row-2">
+									<EditButtons currentMeme={this.state.currentMeme} />
+								</div>
 							</div>
-							<div className="form-group">
-								<label>Image</label>
-								<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
-							</div>
-								<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
-						</form>
-					</Modal>
-					<div className="footer-group">
-						<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" >Help</div>&nbsp; Stock Sloth - a stock photo bank for animals &nbsp; 
+							<Modal open={open} onClose={this.onCloseModal}>
+								<form>
+									<div className="form-group">
+										<label> Photo Title</label>
+										<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
+										<small className="form-text text-muted">You can edit this information later</small>
+									</div>
+									<div className="form-group">
+										<label>Tag</label>
+										<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
+										<small className="form-text text-muted">Tag is used when searching for images</small>
+									</div>
+									<div className="form-group">
+										<label>Image</label>
+										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
+									</div>
+									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+								</form>
+							</Modal>
+							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
+							<ThemeProvider theme={chatBotTheme}>
+								<ChatBot openChat={this.state.chatActive} steps={steps}/>
+							</ThemeProvider>
+							</Modal>
+							<div className="footer-group">
+								<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 						<div className="footer-txt">
+									<p>Feel free to share your images: <br />  via circle buttons</p>
+								</div>
+							</div>
+						</div>
+					);
+				} else {
+					return (
+						<div className="background-light">
+							<div className="header-wrapper">
+								<div className="container-header">
+									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
+									<Switch
+										onChange={this.changeTheme}
+										value="checkedA"
+										color="default"
+									/>
+									<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>Upload</div>
+								</div>
+							</div>
+							<div className="container">
+								<div className="row-1">
+									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								</div>
+								<div className="error-heading">
+									<p>Looks like we have no stock images for that tag</p>
+								</div>
+								<div className="error-subheading">
+									<p>Try entering something else in the search bar </p>
+								</div>
+								<div className="error-subheading">
+									<p> or add an image of what you searched for via the add button</p>
+								</div>
+							</div>
+							{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
+
+							<Modal open={open} onClose={this.onCloseModal}>
+								<form>
+									<div className="form-group">
+										<label> Photo Title</label>
+										<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
+										<small className="form-text text-muted">You can edit this information later</small>
+									</div>
+									<div className="form-group">
+										<label>Tag</label>
+										<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
+										<small className="form-text text-muted">Tag is used when searching for images</small>
+									</div>
+									<div className="form-group">
+										<label>Image</label>
+										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
+									</div>
+									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+								</form>
+							</Modal>
+
+							<div className="large-spacing">
+								<p> large spacing </p>
+							</div>
+							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
+							<ThemeProvider theme={chatBotTheme}>
+								<ChatBot openChat={this.state.chatActive} steps={steps}/>
+							</ThemeProvider>
+							</Modal>
+							<div className="footer-group">
+								<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 							<p>Feel free to share your images: <br />  via circle buttons</p>
-						</div>
-					</div>
-				</div>
-			);
-		} else {
-			return (
-				<div>
-					<div className="header-wrapper">
-						<div className="container-header">
-							<img src={WhiteLogo} height='40' />&nbsp; Stock Image Bank &nbsp;
-					<div className="btn btn-primary btn-action btn-add" onClick={this.onOpenModal}>+ New</div>
-						</div>
-					</div>
-					<div className="container">
-						<div className="row-1">
-							<MemeList memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
-						</div>
-						<div className="error-heading">
-							<p>Looks like we have no stock images for that tag</p>
-						</div>
-						<div className="error-subheading">
-							<p>Try entering something else in the search bar </p>
-						</div>
-						<div className="error-subheading">
-							<p> or add an image of what you searched for via the add button</p>
-						</div>
-					</div>
-					{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
-
-					<Modal open={open} onClose={this.onCloseModal}>
-						<form>
-							<div className="form-group">
-								<label>Meme Title</label>
-								<input type="text" className="form-control" id="meme-title-input" placeholder="Enter Title" />
-								<small className="form-text text-muted">You can edit any meme later</small>
+								{/* <FacebookShareButton url='https://msawebapp2.azurewebsites.net/' /> */}
 							</div>
-							<div className="form-group">
-								<label>Tag</label>
-								<input type="text" className="form-control" id="meme-tag-input" placeholder="Enter Tag" />
-								<small className="form-text text-muted">Tag is used for search</small>
-							</div>
-							<div className="form-group">
-								<label>Image</label>
-								<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
-							</div>
-							<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
-						</form>
-					</Modal>
-
-					<div className="large-spacing">
-						<p> large spacing </p>
-					</div>
-
-					<div className="footer-group">
-					<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" >Help</div>&nbsp; Stock Sloth - a stock photo bank for animals &nbsp; 
-							<p>Feel free to share your images: <br />  via circle buttons</p>
-							{/* <FacebookShareButton url='https://msawebapp2.azurewebsites.net/' /> */}
-					</div>
-				</div>
-			)
-		}
-		}
+						</div>
+					)
+				}
+			}
 		}
 	}
 
@@ -375,7 +475,9 @@ class App extends React.Component<{}, IState> {
 
 	// Modal close
 	private onCloseModal = () => {
-		this.setState({ open: false });
+		this.setState({ chatActive: false, 
+		
+		open: false});
 	};
 
 	// Change selected meme
@@ -387,10 +489,10 @@ class App extends React.Component<{}, IState> {
 
 	// Added via MSA repo
 	private fetchMemes(tag: any) {
-		
-		let url = "http://phase2apitest.azurewebsites.net/api/meme"// "https://phasetwowebapp.azurewebsites.net/api/Meme"
+
+		let url = "https://phasetwowebapp.azurewebsites.net/api/MemeItems"
 		if (tag !== "") {
-			url += "/tag?=" + tag
+			url += "/tag/" + tag
 		}
 		fetch(url, {
 			method: 'GET'
@@ -402,7 +504,7 @@ class App extends React.Component<{}, IState> {
 					this.setState({
 						imageFound: false
 					})
-					currentMeme = { "id": 0, "title": "No memes (╯°□°）╯︵ ┻━┻", "url": "", "tags": "try a different tag", "uploaded": "", "width": "0", "height": "0" }
+					currentMeme = { "id": 0, "title": "", "url": "", "tags": "", "uploaded": "", "width": "0", "height": "0" }
 				} else {
 
 					this.setState({
@@ -436,7 +538,7 @@ class App extends React.Component<{}, IState> {
 
 		const title = titleInput.value
 		const tag = tagInput.value
-		const url = "http://phase2apitest.azurewebsites.net/api/meme/upload" // "https://phasetwowebapp.azurewebsites.net/api/Meme/upload"
+		const url = "https://phasetwowebapp.azurewebsites.net/api/MemeItems/upload"
 
 		const formData = new FormData()
 		formData.append("Title", title)
@@ -461,6 +563,12 @@ class App extends React.Component<{}, IState> {
 	private changeTheme() {
 		this.setState({
 			darktheme: !(this.state.darktheme)
+		})
+	}
+
+	private openChat(){
+		this.setState({
+			chatActive: !(this.state.chatActive)
 		})
 	}
 }
