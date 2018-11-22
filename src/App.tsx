@@ -15,6 +15,7 @@ import WhiteLogo from './stock-sloth-logo-white.png';
 // tslint:disable-next-line:ordered-imports
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import { Transition } from 'react-transition-group';
+import Facebook from './Facebook';
 
 // theme settings for chatbox
 const chatBotTheme = {
@@ -53,7 +54,11 @@ interface IState {
 	chatActive: boolean,
 
 	loginFailure: boolean,
-	uploadDialogue: boolean
+	uploadDialogue: boolean,
+
+	editEnable: boolean,
+
+	loginGuy: boolean
 }
 
 class App extends React.Component<{}, IState> {
@@ -83,7 +88,12 @@ class App extends React.Component<{}, IState> {
 			chatActive: false,
 
 			loginFailure: false,
-			uploadDialogue: false
+			uploadDialogue: false,
+
+			editEnable: false,
+
+			loginGuy: true
+
 		}
 
 		this.selectNewMeme = this.selectNewMeme.bind(this)
@@ -99,6 +109,7 @@ class App extends React.Component<{}, IState> {
 		this.loginClose = this.loginClose.bind(this)
 		this.loginOpen = this.loginOpen.bind(this)
 		this.uploadMessage = this.uploadMessage.bind(this)
+		this.FB=this.FB.bind(this)
 	}
 
 	public render() {
@@ -158,9 +169,9 @@ class App extends React.Component<{}, IState> {
 				// move this to be above the if statement, so it is run once 
 				<div>
 					<div className="login-background">
-						<p>Background</p>
+					<p>jeff</p>
 					</div>
-					<Modal open={true} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
+					<Modal open={this.state.loginGuy} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
 						<div className='containter-login'>
 							<div className="login-image">
 								<img src={BlackLogo} height='60' />
@@ -177,9 +188,15 @@ class App extends React.Component<{}, IState> {
 									ref={this.state.refCamera} />
 							</div>
 							<div className="row-nav-row">
+								<Facebook callBack={this.FB}/>
+							</div>
+								{/* <div className="spacing-button"><p>Space</p></div> */}
+								<div className="row-nav-row">
 								<div className="btn btn-primary btn-action-login" onClick={this.authenticate}>Developer Login</div>
-								<div className="spacing-button"><p>Space</p></div>
-								<div className="btn btn-primary btn-action-login" onClick={this.guestUser}>User Login</div>
+								</div>
+
+							<div className="row-nav-row">
+							<div className="btn btn-primary btn-action-login-guest" onClick={this.guestUser}>User Login</div>
 							</div>
 						</div>
 					</Modal>
@@ -243,7 +260,7 @@ class App extends React.Component<{}, IState> {
 								<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />>
 								</div>
 								<div className="row-2">
-									<EditButtons currentMeme={this.state.currentMeme} />
+									<EditButtons authenticated={this.state.authenticated} currentMeme={this.state.currentMeme} />
 								</div>
 							</div>
 							<Modal open={open} onClose={this.onCloseModal}>
@@ -399,7 +416,7 @@ class App extends React.Component<{}, IState> {
 									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
 								</div>
 								<div className="row-2">
-									<EditButtons currentMeme={this.state.currentMeme} />
+									<EditButtons authenticated={this.state.authenticated} currentMeme={this.state.currentMeme} />
 								</div>
 							</div>
 							<Modal open={open} onClose={this.onCloseModal}>
@@ -522,6 +539,17 @@ class App extends React.Component<{}, IState> {
 		}
 	}
 	
+// authenticate with FB
+private FB = (response: any) =>{
+	if(!(response.status === "unknown")){
+	this.setState({
+		authenticated:true,
+		loginGuy: false,
+
+	})
+}
+}
+
 	// Login as guest user
 	private guestUser() {
 		this.setState({ authenticated: true })
@@ -576,7 +604,8 @@ class App extends React.Component<{}, IState> {
 						console.log(json.predictions[0])
 						this.setState({ predictionResult: json.predictions[0] })
 						if (this.state.predictionResult.probability > 0.7) {
-							this.setState({ authenticated: true })
+							this.setState({ authenticated: true,
+							loginGuy: false})
 						} else {
 							this.setState({ authenticated: false })
 							this.loginOpen()
@@ -664,6 +693,7 @@ class App extends React.Component<{}, IState> {
 		formData.append("image", imageFile)
 
 		this.uploadMessage()
+		this.onCloseModal()
 
 		fetch(url, {
 			body: formData,

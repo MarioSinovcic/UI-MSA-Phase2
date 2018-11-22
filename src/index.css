@@ -290,8 +290,20 @@ body{
   border-color: #512da8;
   height:40px;
   border-radius: 8px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.btn-action-login-guest{
+  border-radius: 25px;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  color: white;
+  background-color: peru;
+  border-color: peru;
+  height:40px;
+  border-radius: 8px;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
 
@@ -362,5 +374,3 @@ body{
   color: #eeeeee;
   opacity: 0.5;
 }
-
-

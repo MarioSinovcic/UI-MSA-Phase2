@@ -10,7 +10,8 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 import { Transition } from 'react-transition-group';
 
 interface IProps {
-    currentMeme: any
+    currentMeme: any,
+    authenticated: boolean
 }
 
 interface IState {
@@ -26,7 +27,8 @@ export default class MemeDetail extends React.Component<IProps, IState> {
         this.state = {
             open: false,
             open2: false,
-            open3: false
+            open3: false,
+
         }
 
         this.updateMeme = this.updateMeme.bind(this)
@@ -73,7 +75,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 <DialogTitle id="alert-dialog-slide-title">{"Image Edit Successful"} </DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                Your image has been editted succesfully and you will now be returned to the home page.
+                The image being displayed currently has been editted succesfully.
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -147,7 +149,13 @@ export default class MemeDetail extends React.Component<IProps, IState> {
     }
 
     // Added via MSA repo
-    private updateMeme() {
+    private updateMeme() { 
+        if(!(this.props.authenticated)){
+            
+
+            return;
+        }
+
         const titleInput = document.getElementById("meme-edit-title-input") as HTMLInputElement 
         const tagInput = document.getElementById("meme-edit-tag-input") as HTMLInputElement
 
