@@ -92,14 +92,7 @@ body{
   width: 350px;
   height: 10px;
   font-size: 18px;
-  color: black;
-}
-
-#search-tag-textbox-dark{
-  width: 350px;
-  height: 10px;
-  font-size: 18px;
-  color: white;
+  color:peru;
 }
 
 .searchButton{
@@ -186,6 +179,15 @@ body{
   justify-content: center;
   font-weight: normal;
   font-size: 18px;
+}
+
+#info {
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: normal;
+  font-size: 30px;
 }
 
 .date-header{

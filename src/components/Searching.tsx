@@ -49,7 +49,7 @@ export default class MemeList extends React.Component<IProps, {}> {
                 <div className="row meme-list-heading">
                     <div className="input-group">
                     <MuiThemeProvider theme={theme2}> 
-                        <TextField id="search-tag-textbox-dark" type="text" placeholder="Search for photos"/>
+                        <TextField id="search-tag-textbox" type="text"  placeholder="Search for photos"/>
                     </MuiThemeProvider> 
                         <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
                     </div>
@@ -67,6 +67,7 @@ export default class MemeList extends React.Component<IProps, {}> {
                 </MuiThemeProvider> 
                 </div>
             </div>
+
             )
         }else{
         return (
@@ -79,13 +80,6 @@ export default class MemeList extends React.Component<IProps, {}> {
                         <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
                     </div>
                 </div>                
-                {/* <div className="row meme-list-table">
-                    <table className="table table-striped">
-                        <tbody>
-                            {this.createTable()}
-                        </tbody>
-                    </table>
-                </div> */}
                 <div className="searchButton">
                 <MuiThemeProvider theme={theme}> 
                         <div className="btn btn-primary btn-action" onClick={this.searchByTag} > Search </div>
@@ -129,7 +123,7 @@ export default class MemeList extends React.Component<IProps, {}> {
         if (textBox === null) {
             return;
         }
-        const tag = textBox.value
+        const tag = textBox.value.toLowerCase().trimLeft().trim()
         this.props.searchByTag(tag)
     }
 

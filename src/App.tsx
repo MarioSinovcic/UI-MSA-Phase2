@@ -12,6 +12,9 @@ import EditButtons from './components/EditButtons';
 import Searching from './components/Searching';
 import BlackLogo from './stock-sloth-logo-black.png';
 import WhiteLogo from './stock-sloth-logo-white.png';
+// tslint:disable-next-line:ordered-imports
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import { Transition } from 'react-transition-group';
 
 // theme settings for chatbox
 const chatBotTheme = {
@@ -47,7 +50,10 @@ interface IState {
 	result: any,
 	trigger: boolean,
 
-	chatActive: boolean
+	chatActive: boolean,
+
+	loginFailure: boolean,
+	uploadDialogue: boolean
 }
 
 class App extends React.Component<{}, IState> {
@@ -74,19 +80,25 @@ class App extends React.Component<{}, IState> {
 			result: '',
 			trigger: false,
 
-			chatActive: false
+			chatActive: false,
+
+			loginFailure: false,
+			uploadDialogue: false
 		}
 
 		this.selectNewMeme = this.selectNewMeme.bind(this)
 		this.fetchMemes = this.fetchMemes.bind(this)
 		this.fetchMemes("")
 		this.handleFileUpload = this.handleFileUpload.bind(this)
-		this.uploadMeme = this.uploadMeme.bind(this)
+		this.uploadImage = this.uploadImage.bind(this)
 		this.authenticate = this.authenticate.bind(this)
 		this.guestUser = this.guestUser.bind(this)
 		this.getFaceRecognitionResult = this.getFaceRecognitionResult.bind(this)
 		this.changeTheme = this.changeTheme.bind(this)
 		this.openChat = this.openChat.bind(this)
+		this.loginClose = this.loginClose.bind(this)
+		this.loginOpen = this.loginOpen.bind(this)
+		this.uploadMessage = this.uploadMessage.bind(this)
 	}
 
 	public render() {
@@ -171,6 +183,24 @@ class App extends React.Component<{}, IState> {
 							</div>
 						</div>
 					</Modal>
+					<div>
+                <Dialog
+                open={this.state.loginFailure}
+                TransitionComponent={Transition}
+                onClose={this.loginClose}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description">
+                <DialogTitle id="alert-dialog-slide-title">{"Facial Recognition Failed"} </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                Sorry, the facial authentication system has seems to think you are not a Stock Sloth developer. Please use the "User" Login.
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={this.loginClose} color="primary"> OK </Button>
+                </DialogActions>
+                </Dialog>
+                </div>
 				</div>
 			)
 		} else {
@@ -178,6 +208,24 @@ class App extends React.Component<{}, IState> {
 				if (this.state.imageFound) {
 					return (
 						<div className="background-dark">
+						<div>
+                	<Dialog
+                	open={this.state.uploadDialogue}
+                	TransitionComponent={Transition}
+                	onClose={this.loginClose}
+                	aria-labelledby="alert-dialog-slide-title"
+                	aria-describedby="alert-dialog-slide-description">
+                	<DialogTitle id="alert-dialog-slide-title">{"Uploads Take Time"} </DialogTitle>
+					<DialogContent>
+					<DialogContentText id="alert-dialog-slide-description">
+					Please be patient while the image is uploaded, which can take up to 30 seconds depending on the size of your file.
+					</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+					<Button onClick={this.loginClose} color="primary"> OK </Button>
+					</DialogActions>
+					</Dialog>
+					</div>
 							<div className="header-wrapper-dark">
 								<div className="container-header">
 									<img src={BlackLogo} height='40' />&nbsp; Stock Sloth &nbsp;
@@ -192,7 +240,7 @@ class App extends React.Component<{}, IState> {
 							</div>
 							<div className="container">
 								<div className="row-1">
-									<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />
+								<Searching darktheme={this.state.darktheme} memes={this.state.memes} selectNewMeme={this.selectNewMeme} searchByTag={this.fetchMemes} />>
 								</div>
 								<div className="row-2">
 									<EditButtons currentMeme={this.state.currentMeme} />
@@ -214,7 +262,7 @@ class App extends React.Component<{}, IState> {
 										<label>Image</label>
 										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
 									</div>
-									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
 							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
@@ -233,6 +281,24 @@ class App extends React.Component<{}, IState> {
 				} else {
 					return (
 						<div className="background-dark">
+						<div>
+                	<Dialog
+                	open={this.state.uploadDialogue}
+                	TransitionComponent={Transition}
+                	onClose={this.loginClose}
+                	aria-labelledby="alert-dialog-slide-title"
+                	aria-describedby="alert-dialog-slide-description">
+                	<DialogTitle id="alert-dialog-slide-title">{"Uploads Take Time"} </DialogTitle>
+					<DialogContent>
+					<DialogContentText id="alert-dialog-slide-description">
+					Please be patient while the image is uploaded, which can take up to 30 seconds depending on the size of your file.
+					</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+					<Button onClick={this.loginClose} color="primary"> OK </Button>
+					</DialogActions>
+					</Dialog>
+					</div>
 							<div className="header-wrapper-dark">
 								<div className="container-header">
 									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
@@ -255,7 +321,7 @@ class App extends React.Component<{}, IState> {
 									<p>Try entering something else in the search bar </p>
 								</div>
 								<div className="error-subheading-dark">
-									<p> or add an image of what you searched for via the add button</p>
+									<p> or add an image of what you searched for via the "Upload" button</p>
 								</div>
 							</div>
 							{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
@@ -276,7 +342,7 @@ class App extends React.Component<{}, IState> {
 										<label>Image</label>
 										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
 									</div>
-									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
 
@@ -299,6 +365,24 @@ class App extends React.Component<{}, IState> {
 				if (this.state.imageFound) {
 					return (
 						<div className="background-light">
+						<div>
+                	<Dialog
+                	open={this.state.uploadDialogue}
+                	TransitionComponent={Transition}
+                	onClose={this.loginClose}
+                	aria-labelledby="alert-dialog-slide-title"
+                	aria-describedby="alert-dialog-slide-description">
+                	<DialogTitle id="alert-dialog-slide-title">{"Uploads Take Time"} </DialogTitle>
+					<DialogContent>
+					<DialogContentText id="alert-dialog-slide-description">
+					Please be patient while the image is uploaded, which can take up to 30 seconds depending on the size of your file.
+					</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+					<Button onClick={this.loginClose} color="primary"> OK </Button>
+					</DialogActions>
+					</Dialog>
+					</div>
 							<div className="header-wrapper">
 								<div className="container-header">
 									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
@@ -334,7 +418,7 @@ class App extends React.Component<{}, IState> {
 										<label>Image</label>
 										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
 									</div>
-									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
 							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
@@ -353,6 +437,24 @@ class App extends React.Component<{}, IState> {
 				} else {
 					return (
 						<div className="background-light">
+						<div>
+                	<Dialog
+                	open={this.state.uploadDialogue}
+                	TransitionComponent={Transition}
+                	onClose={this.loginClose}
+                	aria-labelledby="alert-dialog-slide-title"
+                	aria-describedby="alert-dialog-slide-description">
+                	<DialogTitle id="alert-dialog-slide-title">{"Uploads Take Time"} </DialogTitle>
+					<DialogContent>
+					<DialogContentText id="alert-dialog-slide-description">
+					Please be patient while the image is uploaded, which can take up to 30 seconds depending on the size of your file.
+					</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+					<Button onClick={this.loginClose} color="primary"> OK </Button>
+					</DialogActions>
+					</Dialog>
+					</div>
 							<div className="header-wrapper">
 								<div className="container-header">
 									<img src={WhiteLogo} height='40' />&nbsp; Stock Sloth &nbsp;
@@ -375,7 +477,7 @@ class App extends React.Component<{}, IState> {
 									<p>Try entering something else in the search bar </p>
 								</div>
 								<div className="error-subheading">
-									<p> or add an image of what you searched for via the add button</p>
+									<p> or add an image of what you searched for via the "Upload" button</p>
 								</div>
 							</div>
 							{/* add a image hear pointing to the add option if need be with the logo ---------------------*/}
@@ -396,7 +498,7 @@ class App extends React.Component<{}, IState> {
 										<label>Image</label>
 										<input type="file" onChange={this.handleFileUpload} className="form-control-file" id="meme-image-input" />
 									</div>
-									<button type="button" className="btn" onClick={this.uploadMeme}>Upload</button>
+									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
 
@@ -419,17 +521,33 @@ class App extends React.Component<{}, IState> {
 			}
 		}
 	}
-
+	
 	// Login as guest user
 	private guestUser() {
 		this.setState({ authenticated: true })
 	}
 
+	// Close the login failure message
+	private loginClose = () => {
+		this.setState({ loginFailure: false,
+						uploadDialogue: false });
+	};
+	
+	// Open the login faliure message
+	private loginOpen = () => {
+        this.setState({ loginFailure: true });
+	};
+	
+	// Open dialogue for uploads
+	private uploadMessage = () => {
+        this.setState({ uploadDialogue: true });
+	};
+	
+
 	// Authenticate
 	private authenticate() {
 		const screenshot = this.state.refCamera.current.getScreenshot();
 		this.getFaceRecognitionResult(screenshot);
-		this.setState({ authenticated: true })
 	}
 
 	// Call custom vision model
@@ -461,7 +579,7 @@ class App extends React.Component<{}, IState> {
 							this.setState({ authenticated: true })
 						} else {
 							this.setState({ authenticated: false })
-
+							this.loginOpen()
 						}
 					})
 				}
@@ -527,7 +645,7 @@ class App extends React.Component<{}, IState> {
 	}
 
 	// Added via MSA repo
-	private uploadMeme() {
+	private uploadImage() {
 		const titleInput = document.getElementById("meme-title-input") as HTMLInputElement
 		const tagInput = document.getElementById("meme-tag-input") as HTMLInputElement
 		const imageFile = this.state.uploadFileList[0]
@@ -545,6 +663,8 @@ class App extends React.Component<{}, IState> {
 		formData.append("Tags", tag)
 		formData.append("image", imageFile)
 
+		this.uploadMessage()
+
 		fetch(url, {
 			body: formData,
 			headers: { 'cache-control': 'no-cache' },
@@ -555,7 +675,8 @@ class App extends React.Component<{}, IState> {
 					// Error State
 					alert(response.statusText)
 				} else {
-					location.reload()
+					this.onCloseModal()
+					// location.reload()
 				}
 			})
 	}
