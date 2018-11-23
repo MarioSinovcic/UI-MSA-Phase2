@@ -1,7 +1,9 @@
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MediaStreamRecorder from 'msr';
 import * as React from "react";
+import { Transition } from 'react-transition-group';
 
 
 // theme used to set colours of UI components
@@ -34,14 +36,28 @@ interface IProps {
     darktheme: any,
 }
 
-export default class MemeList extends React.Component<IProps, {}> {
+interface IState {    
+    currentIndex: any,
+    open: boolean,
+}
+
+
+export default class Searching extends React.Component<IProps, IState> {
     constructor(props: any) {
         super(props)
         this.searchByTag = this.searchByTag.bind(this),
         this.searchTagByVoice = this.searchTagByVoice.bind(this),
         this.postAudio = this.postAudio.bind(this);
-    }
+        this.plusIndex = this.plusIndex.bind(this);
+        this.minusIndex = this.minusIndex.bind(this);
+        this.closeMic = this.closeMic.bind(this);
+        this.disable = this.disable.bind(this);
 
+        this.state = {
+            currentIndex: 0,
+            open: false
+        }
+    }
     public render() {
         if(this.props.darktheme){
             return(
@@ -51,23 +67,40 @@ export default class MemeList extends React.Component<IProps, {}> {
                     <MuiThemeProvider theme={theme2}> 
                         <TextField id="search-tag-textbox" type="text"  placeholder="Search for photos"/>
                     </MuiThemeProvider> 
-                        <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
+                        <div className="btn" onClick={this.disable}><i className="fa fa-microphone" /></div>
                     </div>
                 </div>                
-                {/* <div className="row meme-list-table">
-                    <table className="table table-striped">
-                        <tbody>
-                            {this.createTable()}
-                        </tbody>
-                    </table>
-                </div> */}
                 <div className="searchButton">
                 <MuiThemeProvider theme={theme}> 
                         <div className="btn btn-primary btn-action" onClick={this.searchByTag} > Search </div>
                 </MuiThemeProvider> 
                 </div>
+                <div className="toggle">
+                <div className="toggle">
+                <div className="btn btn-primary btn-action-small" onClick={this.minusIndex} > &#8592; </div>
+                <p className="spacing-button"> spacing </p>
+                <div className="btn btn-primary btn-action-small" onClick={this.plusIndex} > &#8594; </div>
+                </div>
+                </div>
+                <div>
+                <Dialog
+                open={this.state.open}
+                TransitionComponent={Transition}
+                onClose={this.closeMic}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description">
+                <DialogTitle id="alert-dialog-slide-title">{"Image Edit Successful"} </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                The image being displayed currently has been editted succesfully.
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={this.closeMic} color="primary"> OK </Button>
+                </DialogActions>
+                </Dialog>
+                </div>
             </div>
-
             )
         }else{
         return (
@@ -77,7 +110,7 @@ export default class MemeList extends React.Component<IProps, {}> {
                     <MuiThemeProvider theme={theme}> 
                         <TextField id="search-tag-textbox" type="text"  placeholder="Search for photos"/>
                     </MuiThemeProvider> 
-                        <div className="btn" onClick={this.searchTagByVoice}><i className="fa fa-microphone" /></div>
+                        <div className="btn" onClick={this.disable}><i className="fa fa-microphone" /></div>
                     </div>
                 </div>                
                 <div className="searchButton">
@@ -85,40 +118,86 @@ export default class MemeList extends React.Component<IProps, {}> {
                         <div className="btn btn-primary btn-action" onClick={this.searchByTag} > Search </div>
                 </MuiThemeProvider> 
                 </div>
+                <div className="toggle">
+                <div className="toggle">
+                <div className="btn btn-primary btn-action-small" onClick={this.minusIndex} > &#8592; </div>
+                <p className="spacing-button"> spacing </p>
+                <div className="btn btn-primary btn-action-small" onClick={this.plusIndex} > &#8594; </div>
+                </div>
+                </div>
+                <div>
+                <Dialog
+                open={this.state.open}
+                TransitionComponent={Transition}
+                onClose={this.closeMic}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description">
+                <DialogTitle id="alert-dialog-slide-title">{"Feature Temporarily Disabled"} </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                Due to conflicts involving the camera authentication, this feature has been temporarily disabled. 
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={this.closeMic} color="primary"> OK </Button>
+                </DialogActions>
+                </Dialog>
+                </div>
             </div>
         );
             }
     }
 
-    // Construct table using meme list
-    // private createTable() {
-    //     const table: any[] = []
-    //     const memeList = this.props.memes
-    //     if (memeList == null) {
-    //         return table
-    //     }
+    // Close the mic dialgoue
+    private closeMic() {
+        this.setState({ open: false }) 
+    }
 
-    //     for (let i = 0; i < memeList.length; i++) {
-    //         const children = []
-    //         const meme = memeList[i]
-    //         children.push(<td key={"id" + i}>{meme.id}</td>)
-    //         children.push(<td key={"name" + i}>{meme.title}</td>)
-    //         children.push(<td key={"tags" + i}>{meme.tags}</td>)
-    //         table.push(<tr key={i + ""} id={i + ""} onClick={this.selectRow.bind(this, i)}>{children}</tr>)
-    //     }
-    //     return table
-    // }
+    // Swap to the next image if possible ->
+    private plusIndex() {
+        const length = this.props.memes.length;
+        // tslint:disable-next-line:prefer-const
+        let num = (Number(this.state.currentIndex) + 1)
 
-    // // Meme selection handler to display selected meme in details component
-    // private selectRow(index: any) {
-    //     const selectedMeme = this.props.memes[index]
-    //     if (selectedMeme != null) {
-    //         this.props.selectNewMeme(selectedMeme)
-    //     }
-    // }
+        if(num > length-1){
+            num = 0
+        }
+
+        console.log(num, length, this.state.currentIndex)
+
+        if (num != null) {
+            const selectedMeme = this.props.memes[num]
+            this.props.selectNewMeme(selectedMeme)
+            this.setState({ currentIndex: num }) 
+            console.log(num, length, this.state.currentIndex)
+    
+        }
+    }
+
+      // Swap to the next image if possible <-
+    private minusIndex() {
+        const length = this.props.memes.length;
+        // tslint:disable-next-line:prefer-const
+        let num = (Number(this.state.currentIndex) - 1)
+        console.log(num, length, this.state.currentIndex)   
+        
+        if(num <= 0){
+            num = length-1
+        }
+
+        if (num != null) {
+            const selectedMeme = this.props.memes[num]
+            this.props.selectNewMeme(selectedMeme)
+            this.setState({ currentIndex: num }) 
+            console.log(num, length, this.state.currentIndex)
+    
+        }
+    }
 
     // Search meme by tag
     private searchByTag() {
+        const num = 0
+        this.setState({ currentIndex: num }) 
         const textBox = document.getElementById("search-tag-textbox") as HTMLInputElement
         if (textBox === null) {
             return;
@@ -127,9 +206,20 @@ export default class MemeList extends React.Component<IProps, {}> {
         this.props.searchByTag(tag)
     }
 
+    private disable(){
+        this.setState({ open: true }) 
+        if(this.state.open){
+            console.log("should opemn the thing")
+            return;
+        }
+    }
+
+
+    // This section of code doesn't work
     private searchTagByVoice(){
+        // This feature has been currently disabled due to conflicts with the webcam
         const mediaConstraints = {
-            audio: true
+           audio: true
         }
         const onMediaSuccess = (stream: any) => {
             const mediaRecorder = new MediaStreamRecorder(stream);
@@ -149,6 +239,7 @@ export default class MemeList extends React.Component<IProps, {}> {
     }
 
     private postAudio(blob:any) {
+        
         let accessToken: any;
         fetch(' https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken', {
             headers: {

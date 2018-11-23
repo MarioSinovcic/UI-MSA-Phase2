@@ -1,6 +1,6 @@
 import Switch from '@material-ui/core/Switch';
 import * as React from 'react';
-// import FacebookShareButton from 'react-share';
+import {FacebookIcon, FacebookShareButton} from 'react-share';
 // tslint:disable-next-line:ordered-imports
 import Modal from 'react-responsive-modal';
 import ChatBot from 'react-simple-chatbot';
@@ -93,7 +93,6 @@ class App extends React.Component<{}, IState> {
 			editEnable: false,
 
 			loginGuy: true
-
 		}
 
 		this.selectNewMeme = this.selectNewMeme.bind(this)
@@ -127,6 +126,7 @@ class App extends React.Component<{}, IState> {
 				  { value: 1, label: 'Uploading', trigger: '3' },
 				  { value: 2, label: 'Editing', trigger: '4' },
 				  { value: 3, label: 'Searching', trigger: '5' },
+				  { value: 4, label: 'Something Else', trigger: '10'}
 				],
 			  },
 			  {
@@ -162,6 +162,15 @@ class App extends React.Component<{}, IState> {
 				id: '9',
 				message: 'Hope this was helpful.',
 			  },
+			  {
+				id: '10',
+				message: 'If you did not find any of this helpful, feel free to contact me personally at: ',
+				trigger: '11'
+			  },
+			  {
+				  id: '11',
+				  message: 'https://www.linkedin.com/in/mario-sinovcic-b33022159/'
+			  }
 		]
 
 		if (!(this.state.authenticated)) {
@@ -169,7 +178,7 @@ class App extends React.Component<{}, IState> {
 				// move this to be above the if statement, so it is run once 
 				<div>
 					<div className="login-background">
-					<p>jeff</p>
+					<p className="spacing"> space </p>
 					</div>
 					<Modal open={this.state.loginGuy} onClose={this.authenticate} closeOnOverlayClick={false} showCloseIcon={false} center={true}>
 						<div className='containter-login'>
@@ -179,10 +188,10 @@ class App extends React.Component<{}, IState> {
 							<div className="login-text">
 								<p>Stock Sloth</p>
 							</div>
-							<div >
+							<div>
 								<Webcam className="camera"
 									heigth="300"
-									width="400"
+									width="250"
 									audio={false}
 									screenshotFormat="image/jpeg"
 									ref={this.state.refCamera} />
@@ -190,11 +199,9 @@ class App extends React.Component<{}, IState> {
 							<div className="row-nav-row">
 								<Facebook callBack={this.FB}/>
 							</div>
-								{/* <div className="spacing-button"><p>Space</p></div> */}
 								<div className="row-nav-row">
 								<div className="btn btn-primary btn-action-login" onClick={this.authenticate}>Developer Login</div>
 								</div>
-
 							<div className="row-nav-row">
 							<div className="btn btn-primary btn-action-login-guest" onClick={this.guestUser}>User Login</div>
 							</div>
@@ -282,15 +289,26 @@ class App extends React.Component<{}, IState> {
 									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
-							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
-							<ThemeProvider theme={chatBotTheme}>
-								<ChatBot openChat={this.state.chatActive} steps={steps}/>
-							</ThemeProvider>
-							</Modal>
+							<div className="chatbot">
+									{this.state.chatActive &&
+									<ThemeProvider theme={chatBotTheme}>
+									<ChatBot openChat={this.state.chatActive} steps={steps}/>
+									</ThemeProvider>}
+							</div>
 							<div className="footer-group-dark">
 								<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 							<div className="footer-txt">
-									<p>Feel free to share your images: <br />  via circle buttons</p>
+							<p>Feel free to share this site</p>
+									<div>
+									<FacebookShareButton
+                       				 url={"https://www.facebook.com/sharer/sharer.php?u=https%3A//msawebapp2.azurewebsites.net/"}
+                        			quote={"StockSloth"}
+                        			className="share-button">
+                       				<FacebookIcon
+                        			size={32}
+                        			round={true} />
+                    				</FacebookShareButton>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -366,14 +384,27 @@ class App extends React.Component<{}, IState> {
 							<div className="large-spacing">
 								<p> large spacing </p>
 							</div>
-							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
-							<ThemeProvider theme={chatBotTheme}>
-								<ChatBot openChat={this.state.chatActive} steps={steps}/>
-							</ThemeProvider>
-							</Modal>
+							<div className="chatbot">
+									{this.state.chatActive &&
+									<ThemeProvider theme={chatBotTheme}>
+									<ChatBot openChat={this.state.chatActive} steps={steps}/>
+									</ThemeProvider>}
+							</div>
 							<div className="footer-group-dark">
 								<img src={BlackLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action-dark btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
-								<p>Feel free to share your images: <br />  via circle buttons</p>
+								<div className="footer-txt">	
+								<p>Feel free to share this site</p>
+								<div>
+								<FacebookShareButton
+                       				 url={"https://www.facebook.com/sharer/sharer.php?u=https%3A//msawebapp2.azurewebsites.net/"}
+                        			quote={"StockSloth"}
+                        			className="share-button">
+                       				<FacebookIcon
+                        			size={32}
+                        			round={true} />
+                    				</FacebookShareButton>
+									</div>
+							</div>
 							</div>
 						</div>
 					)
@@ -438,15 +469,26 @@ class App extends React.Component<{}, IState> {
 									<button type="button" className="btn" onClick={this.uploadImage}>Upload</button>
 								</form>
 							</Modal>
-							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
-							<ThemeProvider theme={chatBotTheme}>
-								<ChatBot openChat={this.state.chatActive} steps={steps}/>
-							</ThemeProvider>
-							</Modal>
+							<div className="chatbot">
+									{this.state.chatActive &&
+									<ThemeProvider theme={chatBotTheme}>
+									<ChatBot openChat={this.state.chatActive} steps={steps}/>
+									</ThemeProvider>}
+							</div>
 							<div className="footer-group">
 								<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
 						<div className="footer-txt">
-									<p>Feel free to share your images: <br />  via circle buttons</p>
+									<p>Feel free to share this site </p>
+									<div>
+									<FacebookShareButton
+                       				 url={"https://www.facebook.com/sharer/sharer.php?u=https%3A//msawebapp2.azurewebsites.net/"}
+                        			quote={"StockSloth"}
+                        			className="share-button">
+                       				<FacebookIcon
+                        			size={32}
+                        			round={true} />
+                    				</FacebookShareButton>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -522,15 +564,27 @@ class App extends React.Component<{}, IState> {
 							<div className="large-spacing">
 								<p> large spacing </p>
 							</div>
-							<Modal open={this.state.chatActive} onClose={this.onCloseModal}>
-							<ThemeProvider theme={chatBotTheme}>
-								<ChatBot openChat={this.state.chatActive} steps={steps}/>
-							</ThemeProvider>
-							</Modal>
+							<div className="chatbot">
+									{this.state.chatActive &&
+									<ThemeProvider theme={chatBotTheme}>
+									<ChatBot openChat={this.state.chatActive} steps={steps}/>
+									</ThemeProvider>}
+							</div>
 							<div className="footer-group">
 								<img src={WhiteLogo} height='40' />&nbsp; <div className="btn btn-primary btn-action btn-add" onClick={this.openChat}>Help</div>&nbsp; Stock Sloth - a stock bank for animal photos &nbsp;
-							<p>Feel free to share your images: <br />  via circle buttons</p>
-								{/* <FacebookShareButton url='https://msawebapp2.azurewebsites.net/' /> */}
+								<div className="footer-txt">
+							<p>Feel free to share this site</p>
+							<div>
+							<FacebookShareButton
+                       				 url={"https://www.facebook.com/sharer/sharer.php?u=https%3A//msawebapp2.azurewebsites.net/"}
+                        			quote={"StockSloth"}
+                        			className="share-button">
+                       				<FacebookIcon
+                        			size={32}
+                        			round={true} />
+                    		</FacebookShareButton>
+							</div>
+							</div>
 							</div>
 						</div>
 					)
@@ -723,5 +777,4 @@ private FB = (response: any) =>{
 		})
 	}
 }
-
 export default App;

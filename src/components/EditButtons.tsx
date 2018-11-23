@@ -20,7 +20,7 @@ interface IState {
     open3: boolean
 }
 
-export default class MemeDetail extends React.Component<IProps, IState> {
+export default class EditButtons extends React.Component<IProps, IState> {
 
     constructor(props: any) {
         super(props)
@@ -30,7 +30,6 @@ export default class MemeDetail extends React.Component<IProps, IState> {
             open3: false,
 
         }
-
         this.updateMeme = this.updateMeme.bind(this)
         this.deleteMeme = this.deleteMeme.bind(this)
         this.handleClickOpen = this.handleClickOpen.bind(this)
@@ -75,7 +74,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 <DialogTitle id="alert-dialog-slide-title">{"Image Edit Successful"} </DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                The image being displayed currently has been editted succesfully.
+                The image being displayed currently has been editted succesfully, refresh the page to see your changes.
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -93,7 +92,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
                 <DialogTitle id="alert-dialog-slide-title">{"Deletion Successful"} </DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                The image currently displayed has been deleted.
+                The image currently displayed has been deleted. Refresh the page to see your changes.
                 </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -120,14 +119,14 @@ export default class MemeDetail extends React.Component<IProps, IState> {
         );
     }
 
-        // Modal Open
-        private onOpenModal = () => {
-            this.setState({ open: true });
-        };
+    // Modal Open
+    private onOpenModal = () => {
+        this.setState({ open: true });
+    };
     
-       // Modal Close
-        private onCloseModal = () => {
-            this.setState({ open: false });
+    // Modal Close
+    private onCloseModal = () => {
+        this.setState({ open: false });
     };
 
     private handleClickOpen = () => {
@@ -150,16 +149,9 @@ export default class MemeDetail extends React.Component<IProps, IState> {
 
     // Added via MSA repo
     private updateMeme() { 
-        if(!(this.props.authenticated)){
-            
-
-            return;
-        }
-
         const titleInput = document.getElementById("meme-edit-title-input") as HTMLInputElement 
         const tagInput = document.getElementById("meme-edit-tag-input") as HTMLInputElement
-
-        console.log(titleInput)
+        console.log(titleInput, tagInput)
 
         if (titleInput === null || tagInput === null || tagInput.size <=1 || titleInput.size <=1) {
             return;
@@ -170,7 +162,7 @@ export default class MemeDetail extends React.Component<IProps, IState> {
         const currentMeme = this.props.currentMeme
         const url = "https://phasetwowebapp.azurewebsites.net/api/MemeItems/" + currentMeme.id
         const updatedTitle = titleInput.value
-        const updatedTag = tagInput.value.toLowerCase()
+        const updatedTag = tagInput.value.toLowerCase().trim()
         fetch(url, {
             body: JSON.stringify({
                 "height": currentMeme.height,
